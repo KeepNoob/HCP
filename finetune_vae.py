@@ -57,6 +57,10 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(vae.parameters(), lr=args.learning_rate) 
     # Fine-tune the model
     for epoch in tqdm(range(args.epochs)):
-        total_loss = train_one_epoch(vae, dataloader, vae.optimizer, args.device)
+        total_loss = train_one_epoch(vae, dataloader, vae.optimizer, args.device, hcp_type= args.hcp_type)
         print(f"Epoch {epoch+1}/{args.epochs}, Loss: {total_loss:.4f}")
+        # Save the model
+        if (epoch+1) % args.save_interval == 0:
+            torch.save(vae.state_dict(), f"{args.save_dir}/vae_{args.hcp_type}_{epoch+1}.pt")
+
             

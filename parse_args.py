@@ -14,6 +14,8 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--device', type=str, default='cuda:0' if torch.cuda.is_available() else 'cpu')
+    parser.add_argument('--save_interval', type=int, default=25,)
+    parser.add_argument('--hcp_type', type=str, default='PRHCP', help='Type of HCP loss to use')
     parser.add_argument('--num-workers', type=int, default=4, metavar='N',
                         help='number of dataloader workers if device is CPU (default: 8)')
     
