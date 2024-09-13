@@ -15,7 +15,7 @@ def rand_projections(embedding_dim, num_samples=50):
     projections = [w / np.sqrt((w**2).sum())
                    for w in np.random.normal(size=(num_samples, embedding_dim))]
     projections = np.asarray(projections)
-    return torch.from_numpy(projections).type(torch.FloatTensor)
+    return torch.from_numpy(projections).to(torch.float)
 
 
 # IPRHCP-AE

@@ -375,4 +375,4 @@ def gPRHCP(X, Y, a, b, q=2, niter=10):
     
     distance = gHCP(X@U,Y@U,a,b)
 
-    return U, distance
+    return U, distance #error
