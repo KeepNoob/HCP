@@ -185,28 +185,29 @@ def PRHCP(X, Y, q=2, niter=10):
     device = X.device
     X = X.cpu()
     Y = Y.cpu()
-    while i<niter:
-        if i==0:
-            Xr = hilbert_order(X)
-            Yr = hilbert_order(Y)
-            delta = (X[Xr,:]-Y[Yr,:]).cpu()
-        else:
-            Xu = X@U
-            Yu = Y@U
-            Xr = hilbert_order(Xu)
-            Yr = hilbert_order(Yu)
-            delta = (X[Xr,:]-Y[Yr,:]).cpu()
-        
-        disp = np.concatenate([delta, -delta])
-        pca = PCA(n_components = q, random_state = 1)
-        pca.fit(disp)
-        U = pca.components_.T
-        Omega = (1-tau)*Omega + tau*U@U.T
-        eigenvalues, eigenvectors = sp.linalg.eigh(Omega, eigvals=(d-q,d-1))
-        U = eigenvectors
-        t += 1
-        tau = 2/(2+t)
-        i += 1
+    with torch.no_grad():
+        while i<niter:
+            if i==0:
+                Xr = hilbert_order(X)
+                Yr = hilbert_order(Y)
+                delta = (X[Xr,:]-Y[Yr,:]).cpu()
+            else:
+                Xu = X@U
+                Yu = Y@U
+                Xr = hilbert_order(Xu)
+                Yr = hilbert_order(Yu)
+                delta = (X[Xr,:]-Y[Yr,:]).cpu()
+            
+            disp = np.concatenate([delta, -delta])
+            pca = PCA(n_components = q, random_state = 1)
+            pca.fit(disp)
+            U = pca.components_.T
+            Omega = (1-tau)*Omega + tau*U@U.T
+            eigenvalues, eigenvectors = sp.linalg.eigh(Omega, eigvals=(d-q,d-1))
+            U = eigenvectors
+            t += 1
+            tau = 2/(2+t)
+            i += 1
     
     U = torch.tensor(U, dtype=torch.float32)
     X.to(device)
@@ -229,9 +230,16 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(device)
     X = torch.randn(100, 10).to(device)
+    X.requires_grad = True
     Y = torch.randn(100, 10).to(device)
-    print(f"HCP-distance: {HCP(X, Y)}")
-    print(f"IPHCP-distance {IPRHCP(X, Y)}")
-    print(f"PRHCP-distance {PRHCP(X, Y)}")
+    hcp = HCP(X, Y)
+    print(f"HCP-distance: {hcp}")
+    print(f"HCP-distance backward:{hcp.backward()}")
+    iprhcp = IPRHCP(X, Y)
+    print(f"IPHCP-distance {iprhcp}")
+    print(f"IPHCP-distance backward:{iprhcp.backward()}")
+    prhcp = PRHCP(X, Y)
+    print(f"PRHCP-distance {prhcp}")
+    print(f"PRHCP-distance backward:{prhcp.backward()}")
     vae= AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse")
     print(vae.parameters())
