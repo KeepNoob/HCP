@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('--device', type=str, default='cuda:0' if torch.cuda.is_available() else 'cpu')
     parser.add_argument('--save_interval', type=int, default=25,)
     parser.add_argument('--hcp_type', type=str, default='PRHCP', help='Type of HCP loss to use')
+    parser.add_argument(('-resume-ckpts', type=str, default=None, help='Path to the checkpoint to resume training'))
     parser.add_argument('--num-workers', type=int, default=4, metavar='N',
                         help='number of dataloader workers if device is CPU (default: 8)')
     

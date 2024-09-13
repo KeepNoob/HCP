@@ -41,6 +41,8 @@ if __name__ == '__main__':
 
     # Load the pretrained model
     vae= AutoencoderKL.from_pretrained(args.pretrained)
+    if args.resume_ckpts != None:
+        vae.load_state_dict(torch.load(args.resume_ckpts))
     vae = vae.to(args.device)
     vae.train()
     # Load the dataset
